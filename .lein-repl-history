@@ -1,0 +1,20 @@
+(use 'hiccup.core)
+exit
+(use 'hiccup.form)
+(html
+  #_=> [:div {:class "url"}
+  #_=> [:a {:href "http://clojure.org"} "Clojure - home"]])
+(html
+[:div {:class "url"}
+[:a {:href "http://clojure.org"} "Clojure - home"]])
+(html5
+[:div {:class "url"}
+[:a {:href "http://clojure.org"} "Clojure - home"]])
+(use 'hiccup.page)
+(html5
+[:div {:class "url"}
+[:a {:href "http://clojure.org"} "Clojure - home"]])
+(html5
+[:p {:class "url"}])
+(html5
+[:p {:class "url"} "urli luokka"])
