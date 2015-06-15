@@ -3,7 +3,8 @@
             [guestbook.views.layout :as layout]
             [hiccup.form :refer
               [form-to label text-field password-field submit-button]]
-            [noir.response :refer [redirect]]))
+            [noir.response :refer [redirect]]
+            [noir.session :as session]))
 
 
 (defn control [field name text]
@@ -19,11 +20,29 @@
       (control password-field :pass1 "Retype Password")
       (submit-button "Create Account"))))
 
+(defn login-page []
+  (layout/common
+    (form-to [:post "/login"]
+    (control text-field :id "screen name")
+    (control password-field :pass "Password")
+    (submit-button "login"))))
+
+(defn logout-page []
+  (layout/common
+    (form-to [:post "/logout"]
+    (submit-button "logout"))))
+
 (defroutes auth-routes
   (GET "/register" [_] (registration-page))
   (POST "/register" [id pass pass1]
     (if (= pass pass1)
       (redirect "/")
-      (registration-page))))
-
-;; sivu 56 managing sessions
+      (registration-page)))
+  (GET "/login" [] (login-page))
+  (POST "/login" [id pass]
+    (session/put! :user id)
+    (redirect "/"))
+  (GET "/logout" [] (logout-page))
+  (POST "/logout" []
+    (session/clear!)
+    (redirect "/")))

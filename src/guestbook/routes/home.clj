@@ -3,7 +3,8 @@
             [guestbook.views.layout :as layout]
             [compojure.route :as route]
             [hiccup.form :refer :all]
-            [guestbook.models.db :as db]))
+            [guestbook.models.db :as db]
+            [noir.session :as session]))
 
 (defn format-time [timestamp]
   (-> "dd/MM/yyyy"
@@ -20,7 +21,7 @@
 
 (defn home [& [name message error]]
   (layout/common
-    [:h1 "Guestbook"]
+    [:h1 "Guestbook " (session/get :user)]
     [:p "Welcome to my guestbook"]
     [:p {:class "error"} error]
     ;here we call our show-guests function
