@@ -4,11 +4,16 @@
             [hiccup.form :refer
               [form-to label text-field password-field submit-button]]
             [noir.response :refer [redirect]]
-            [noir.session :as session]))
+            [noir.session :as session]
+            [noir.validation
+              :refer [rule errors? has-value? on-error]]))
 
+(defn format-error [[error]]
+  [:p.error error])
 
 (defn control [field name text]
-  (list (label name text)
+  (list (on-error name format-error)
+        (label name text)
         (field name)
         [:br]))
 
@@ -20,12 +25,27 @@
       (control password-field :pass1 "Retype Password")
       (submit-button "Create Account"))))
 
-(defn login-page []
+(defn login-page [& [error]]
   (layout/common
     (form-to [:post "/login"]
-    (control text-field :id "screen name")
-    (control password-field :pass "Password")
-    (submit-button "login"))))
+      (control text-field :id "screen name")
+      (control password-field :pass "Password")
+      (submit-button "login"))))
+
+(defn handle-login [id pass]
+  (rule (has-value? id)
+    [:id "screen name is required"])
+  (rule (= id "foo")
+    [:id "unknown user"])
+  (rule (has-value? pass)
+    [:pass "password is required"])
+  (rule (= pass "bar")
+    [:pass "invalid password"])
+  (if (errors? :id :pass)
+    (login-page)
+  (do
+    (session/put! :user id)
+    (redirect "/"))))
 
 (defn logout-page []
   (layout/common
@@ -40,8 +60,7 @@
       (registration-page)))
   (GET "/login" [] (login-page))
   (POST "/login" [id pass]
-    (session/put! :user id)
-    (redirect "/"))
+    (handle-login id pass))
   (GET "/logout" [] (logout-page))
   (POST "/logout" []
     (session/clear!)
