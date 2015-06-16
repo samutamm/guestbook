@@ -28,9 +28,10 @@
 
 (def app
   (-> (handler/site
-      (routes auth-routes
-               home-routes
-               app-routes))
+        (routes auth-routes
+                 home-routes
+                 app-routes))
+      (wrap-base-url)
       (session/wrap-noir-session
-        {:store (memory-store)}))
-      (wrap-noir-validation))
+        {:store (memory-store)})
+      (wrap-noir-validation)))
